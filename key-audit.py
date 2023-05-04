@@ -18,8 +18,8 @@ if not _PGPKEYDUMP_BINARY:
 
 stats: dict = {
     "total-keys": 0,
+    "no-public-key": 0,
     "key-is-subkey": [],
-    "no-public-key": [],
     "unauditable-keys": [],
     "primary-keys-by-algo": defaultdict(int),
     "effective-keys-by-algo": defaultdict(int),
@@ -32,7 +32,7 @@ for line in sys.stdin:
     stats["total-keys"] += 1
 
     if key is None:
-        stats["no-public-key"].append(keyid)
+        stats["no-public-key"] += 1
         continue
 
     with NamedTemporaryFile(mode="w") as f:
@@ -59,10 +59,5 @@ for line in sys.stdin:
 
     stats["primary-keys-by-algo"][primary_key["algorithm"]] += 1
     stats["effective-keys-by-algo"][key_under_audit["algorithm"]] += 1
-
-# print(
-#     f"number of key IDs without a publicly discoverable key: {len(stats['no-public-key'])}",
-#     file=sys.stderr,
-# )
 
 print(json.dumps(stats))
