@@ -16,6 +16,30 @@ _PGPKEYDUMP_BINARY = os.getenv("PGPKEYDUMP", shutil.which("pgpkeydump"))
 if not _PGPKEYDUMP_BINARY:
     raise ValueError("missing pgpkeydump binary to dump with")
 
+
+def _rsa_params(key: dict) -> tuple[int, int]:
+    assert key["algorithm"] == "RSA"
+    e, n = key["parameters"]["e"], key["parameters"]["n"]
+
+    # For e, we care about the actual value (which is stored as hex).
+    # For n, we care about the bitness.
+    return (int(e["value"], 16), n["bitness"])
+
+
+def _dsa_params(key: dict) -> int:
+    assert key["algorithm"] == "DSA"
+
+    # We only care about the bitness of p.
+    return key["parameters"]["p"]["bitness"]
+
+
+def _ecdsa_params(key: dict) -> int:
+    assert key["algorithm"] == "ECDSA"
+
+    # We only care about the curve, for now.
+    return key["parameters"]["curve"]
+
+
 stats: dict = {
     "total-keys": 0,
     "no-public-key": 0,
@@ -23,6 +47,18 @@ stats: dict = {
     "unauditable-keys": [],
     "primary-keys-by-algo": defaultdict(int),
     "effective-keys-by-algo": defaultdict(int),
+    "rsa-params": {
+        "primary": [],
+        "effective": [],
+    },
+    "dsa-params": {
+        "primary": [],
+        "effective": [],
+    },
+    "ecdsa-params": {
+        "primary": [],
+        "effective": [],
+    },
 }
 
 for line in sys.stdin:
@@ -59,5 +95,20 @@ for line in sys.stdin:
 
     stats["primary-keys-by-algo"][primary_key["algorithm"]] += 1
     stats["effective-keys-by-algo"][key_under_audit["algorithm"]] += 1
+
+    if primary_key["algorithm"] == "RSA":
+        stats["rsa-params"]["primary"].append(_rsa_params(primary_key))
+    if key_under_audit["algorithm"] == "RSA":
+        stats["rsa-params"]["effective"].append(_rsa_params(key_under_audit))
+
+    if primary_key["algorithm"] == "DSA":
+        stats["dsa-params"]["primary"].append(_dsa_params(primary_key))
+    if key_under_audit["algorithm"] == "DSA":
+        stats["dsa-params"]["effective"].append(_dsa_params(key_under_audit))
+
+    if primary_key["algorithm"] == "ECDSA":
+        stats["ecdsa-params"]["primary"].append(_ecdsa_params(primary_key))
+    if key_under_audit["algorithm"] == "ECDSA":
+        stats["ecdsa-params"]["effective"].append(_ecdsa_params(key_under_audit))
 
 print(json.dumps(stats))
