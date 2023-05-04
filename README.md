@@ -16,9 +16,9 @@ become outdated or broken over time.
 
 Create a virtual environment with the dependencies needed:
 
-```
+```bash
 python -m venv --upgrade-deps env
-./env/bin/python -m pip install -r requirements.txt
+./env/bin/python -m pip install -r requirements.txt -r dev-requirements.txt
 ```
 
 ### `inputs/dists-with-signatures.csv`
