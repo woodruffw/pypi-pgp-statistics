@@ -24,14 +24,31 @@ def _get_key_by_keyid(keyid: str):
     key = None
     if not resp.ok:
         if resp.status_code == 404:
-            print(f"no key found for ID: {keyid}", file=sys.stderr)
+            print(f"keys.openpgp.org: no key found for ID: {keyid}", file=sys.stderr)
         else:
             resp.raise_for_status()
     else:
         print(f"got key for {keyid}!", file=sys.stderr)
         key = resp.content.decode()
+        print(json.dumps({"keyid": keyid, "key": key}))
+        return
+
+    print(f"{keyid}: trying harder...", file=sys.stderr)
+    prefixed = f"0x{keyid}"
+    resp = requests.get(f"https://keyserver.ubuntu.com/pks/lookup?search={prefixed}&op=get")
+    if not resp.ok:
+        if resp.status_code == 404:
+            print(f"keyserver.ubuntu.com: no key found for ID: {keyid}", file=sys.stderr)
+        else:
+            resp.raise_for_status()
+    else:
+        print(f"paid off: got key for {keyid}!", file=sys.stderr)
+        key = resp.content.decode()
+        # There's no telling what people are capable of these days.
+        assert key.startswith("-----BEGIN PGP PUBLIC KEY BLOCK-----")
 
     print(json.dumps({"keyid": keyid, "key": key}))
+
 
 
 for keyid in _DISTS_BY_KEYID.keys():
