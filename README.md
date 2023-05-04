@@ -45,7 +45,7 @@ AND upload_time > TIMESTAMP("2020-03-27 00:00:00")
 
 ```bash
 ./env/bin/python all-dist-keys.py \
-    <(some jq magic here)
+    < outputs/dists-by-keyid.json \
     > outputs/all-dist-keys.jsonl
 ```
 
@@ -53,6 +53,6 @@ AND upload_time > TIMESTAMP("2020-03-27 00:00:00")
 
 ```bash
 ./env/bin/python key-audit.py \
-    < outputs/all-dist-keys.jsonl
+    < outputs/all-dist-keys.jsonl \
     > outputs/key-audit.jsonl
 ```
