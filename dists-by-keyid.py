@@ -14,20 +14,11 @@ import pgpy
 import requests
 
 _SIGNATURE_URL_FORMAT = (
-    "https://files.pythonhosted.org/packages/{version}/{prefix}/{name}/{dist}.asc"
+    "https://files.pythonhosted.org/packages/{chunked_digest}/{dist}.asc"
 )
 
 # map of key ID -> distributions signed by that key
 _KEY_ID_MAP: dict[str, list[dict[str, str]]] = defaultdict(list)
-
-
-def sig_for_dist(dist: str) -> pgpy.PGPSignature:
-    # each distribution is hosted on PyPI,
-    # and has an associated signature at its distribution
-    # URL with `.asc` appended.
-
-    raise
-    pass
 
 
 def keyid_for_sig(sig: pgpy.PGPSignature) -> str:
@@ -36,10 +27,10 @@ def keyid_for_sig(sig: pgpy.PGPSignature) -> str:
 
 io = csv.DictReader(sys.stdin)
 for rec in io:
+    digest = rec["blake2_256_digest"]
+    chunked_digest = f"{digest[0:2]}/{digest[2:4]}/{digest[4:]}"
     sig_url = _SIGNATURE_URL_FORMAT.format(
-        version=rec["python_version"],
-        prefix=rec["name"][0],
-        name=rec["name"],
+        chunked_digest=chunked_digest,
         dist=rec["filename"],
     )
     print(f"retrieving: {sig_url}", file=sys.stderr)

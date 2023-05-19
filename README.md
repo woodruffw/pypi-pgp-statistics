@@ -1,7 +1,7 @@
 # pypi-pgp-statistics
 
 **NOTE**: The data in this repository comes from [PyPI's BigQuery dataset],
-and was generated on 2023-03-26. See
+and was generated on 2023-05-19. See
 [Updating the files](#updating-the-files) for steps for rebuilding
 it.
 
@@ -27,7 +27,7 @@ Run the following BigQuery query (tweak the timestamp,
 if you'd like):
 
 ```sql
-SELECT name, version, filename, python_version
+SELECT name, version, filename, python_version, blake2_256_digest
 FROM `bigquery-public-data.pypi.distribution_metadata`
 WHERE has_signature
 AND upload_time > TIMESTAMP("2020-03-27 00:00:00")
