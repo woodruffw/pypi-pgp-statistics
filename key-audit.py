@@ -45,6 +45,7 @@ stats: dict = {
     "no-public-key": 0,
     "no-binding-signature-at-creation": 0,
     "no-binding-signature-now": 0,
+    "keyid-does-not-match-at-all": [],
     "key-is-subkey": [],
     "unauditable-keys": [],
     "primary-keys-by-algo": defaultdict(int),
@@ -95,8 +96,11 @@ for line in sys.stdin:
     primary_key, subkeys = audit["primary_key"], audit["subkeys"]
 
     if keyid != primary_key["keyid"]:
+        key_under_audit = next((k for k in subkeys if k["keyid"] == keyid), None)
+        if key_under_audit is None:
+            stats["keyid-does-not-match-at-all"].append(keyid)
+            continue
         stats["key-is-subkey"].append((primary_key["keyid"], keyid))
-        key_under_audit = next(k for k in subkeys if k["keyid"] == keyid)
     else:
         key_under_audit = primary_key
 
