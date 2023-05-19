@@ -43,6 +43,8 @@ def _ecdsa_params(key: dict) -> int:
 stats: dict = {
     "total-keys": 0,
     "no-public-key": 0,
+    "no-binding-signature-at-creation": 0,
+    "no-binding-signature-now": 0,
     "key-is-subkey": [],
     "unauditable-keys": [],
     "primary-keys-by-algo": defaultdict(int),
@@ -85,6 +87,11 @@ for line in sys.stdin:
             continue
 
     audit = json.loads(result.stdout)
+    if not audit["binding_signature_at_creation"]:
+        stats["no-binding-signature-at-creation"] += 1
+    if not audit["binding_signature_now"]:
+        stats["no-binding-signature-now"] += 1
+
     primary_key, subkeys = audit["primary_key"], audit["subkeys"]
 
     if keyid != primary_key["keyid"]:
