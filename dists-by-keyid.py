@@ -21,10 +21,6 @@ _SIGNATURE_URL_FORMAT = (
 _KEY_ID_MAP: dict[str, list[dict[str, str]]] = defaultdict(list)
 
 
-def keyid_for_sig(sig: pgpy.PGPSignature) -> str:
-    return sig.signer
-
-
 io = csv.DictReader(sys.stdin)
 for rec in io:
     digest = rec["blake2_256_digest"]
