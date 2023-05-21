@@ -17,6 +17,25 @@ if not _PGPKEYDUMP_BINARY:
     raise ValueError("missing pgpkeydump binary to dump with")
 
 
+def _algo_ident(key: dict) -> str:
+    """
+    Returns a common sense identifier for the key's algo,
+    e.g. RSA-2048 or DSA-1024.
+    """
+    match key["algorithm"]:
+        case "RSA":
+            return f"RSA-{_rsa_params(key)[1]}"
+        case "DSA":
+            return f"DSA-{_dsa_params(key)}"
+        case "EdDSA":
+            return "EdDSA"
+        case "ECDSA":
+            # return the curve name.
+            return _ecdsa_params(key)
+        case _:
+            raise ValueError("unreachable, hopefully")
+
+
 def _rsa_params(key: dict) -> tuple[int, int]:
     assert key["algorithm"] == "RSA"
     e, n = key["parameters"]["e"], key["parameters"]["n"]
@@ -104,8 +123,8 @@ for line in sys.stdin:
     else:
         key_under_audit = primary_key
 
-    stats["primary-keys-by-algo"][primary_key["algorithm"]] += 1
-    stats["effective-keys-by-algo"][key_under_audit["algorithm"]] += 1
+    stats["primary-keys-by-algo"][_algo_ident(primary_key)] += 1
+    stats["effective-keys-by-algo"][_algo_ident(key_under_audit)] += 1
 
     if primary_key["algorithm"] == "RSA":
         stats["rsa-params"]["primary"].append(_rsa_params(primary_key))

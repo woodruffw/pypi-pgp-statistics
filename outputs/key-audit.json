@@ -730,16 +730,28 @@
     ],
     "unauditable-keys": [],
     "primary-keys-by-algo": {
-        "RSA": 671,
-        "DSA": 51,
+        "RSA-2048": 127,
+        "DSA-1024": 40,
+        "RSA-4096": 497,
         "EdDSA": 35,
-        "ECDSA": 1
+        "RSA-3072": 45,
+        "DSA-3072": 7,
+        "DSA-2048": 4,
+        "NIST P-521": 1,
+        "RSA-4064": 1,
+        "RSA-4032": 1
     },
     "effective-keys-by-algo": {
-        "RSA": 670,
-        "DSA": 43,
+        "RSA-2048": 151,
+        "DSA-1024": 31,
+        "RSA-4096": 471,
         "EdDSA": 43,
-        "ECDSA": 2
+        "RSA-3072": 47,
+        "DSA-2048": 5,
+        "NIST P-521": 1,
+        "DSA-3072": 7,
+        "brainpoolP512r1": 1,
+        "RSA-4032": 1
     },
     "rsa-params": {
         "primary": [
