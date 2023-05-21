@@ -5,6 +5,8 @@ and was generated on 2023-05-19. See
 [Updating the files](#updating-the-files) for steps for rebuilding
 it.
 
+See [self-audit](#self-audit) if you want to check your own project on pypi!
+
 [PyPI's BigQuery dataset]: https://warehouse.pypa.io/api-reference/bigquery-datasets.html
 
 ## Updating the files
@@ -56,3 +58,16 @@ AND upload_time > TIMESTAMP("2020-03-27 00:00:00")
     < outputs/all-dist-keys.jsonl \
     > outputs/key-audit.json
 ```
+
+## Self-audit
+
+The script selfaudit-pypi-key.py checks the signature of the 
+most recent pypi release.
+
+Run as:
+
+```bash
+python selfaudit-pypi-key.py myprojectname
+```
+
+try for example: gpg, trytond_account_invoice_history, snowline, 
